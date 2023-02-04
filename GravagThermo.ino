@@ -26,6 +26,10 @@ byte pos1_last_status = 0;  // START ( 0 = abgelegt | 1 = angehoben )
 byte pos2_last_status = 0;  // ENDE ( 0 = abgelegt | 1 = angehoben )
 
 bool error_input_toggle_state = false;
+bool error_input_validation_pending = false; // Wird aktuell ein EIV-Check durchgeführt?
+int error_input_validation_signal = 0; // Logik-Signal des aktuellen EIV-Check
+long error_input_validation_end_time = 0L; // End-Zeit des aktullen EIV-Check
+int error_input_validation_delay = 10; // Dauer für für EIV (Validierung)
 
 void setup() {
   pinMode(pos1_pin, INPUT);  // START
@@ -80,16 +84,17 @@ void loop() {
     pos2_last_status = 0;
   }
 
+  // Offene EIV-Check(s) durchführen
+  OnErrorInputValidationCheck();
   if (digitalRead(error_input_pin) == LOW && !error_input_toggle_state) {
-    // Draht berührt
-    OnBehruehrungDraht();
-    error_input_toggle_state = true;
+    // Signal fallend
+    OnErrorInputChange(LOW); // Error Input
+    error_input_toggle_state = true; // Für Toggling
   }
-
   if (digitalRead(error_input_pin) == HIGH && error_input_toggle_state) {
-    // Draht losgelassen
-    OnLoslassenDraht();
-    error_input_toggle_state = false;
+    // Signal steigend
+    OnErrorInputChange(HIGH); // Error Input
+    error_input_toggle_state = false; // Für Toggling
   }
 
   OnAnzeigenAktualisierenCheck();
@@ -137,18 +142,67 @@ void OnAbgelegtZiel() {
   }
 }
 
+// EVENTS
+void OnErrorInputChange(int state) {
+  //Serial.print("OnErrorInputChange()");
+  if (error_input_validation_pending) {
+    error_input_validation_pending = false;
+    OnErrorInputValidationCheckAbort(state);
+    // Aktueller EIV-Check abbrechen da Statusänderung!
+  } else {
+    // Starte neuen EIV-Check
+    error_input_validation_pending = true;
+    error_input_validation_signal = state;
+    error_input_validation_end_time = millis() + error_input_validation_delay;
+  }
+}
+
+void OnErrorInputValidationCheck() {
+  if (error_input_validation_pending) {
+    if (error_input_validation_end_time <= millis()) {
+      // EIV Zeit erreicht
+      error_input_validation_pending = false;
+      error_input_validation_end_time = 0L;
+      OnErrorInputValidationCheckSuccess(error_input_validation_signal);
+    }
+  }
+}
+
+void OnErrorInputValidationCheckAbort(int state) {
+  //Serial.println("OnErrorInputValidationCheckAbort()");
+  if (state == LOW) {
+    //Serial.println("EIV RESET: Zu LOW gewechselt bevor Validation-Ende!");
+  }
+
+  if (state == HIGH) {
+    //Serial.println("EIV RESET: Zu HIGH gewechselt bevor Validation-Ende!");
+  }
+}
+
+void OnErrorInputValidationCheckSuccess(int state) {
+  //Serial.println("OnErrorInputValidationCheckSuccess()");
+  if (state == LOW) {
+    //Serial.println("EIV SUCCESS: Signal LOW wurde validiert!");
+    OnBehruehrungDraht();
+  }
+  if (state == HIGH) {
+    //Serial.println("EIV SUCCESS: Signal HIGH wurde validiert!");
+    OnLoslassenDraht();
+  }
+}
+
 void OnBehruehrungDraht() {
+  Serial.println("OnBehruehrungDraht()");
   if (SpielStatus == 1) {
-    vol.tone(261 * 2, 255);
     FehlerCounter++;
   }
-  Serial.println("OnBehruehrungDraht()");
+  digitalWrite(4, HIGH);
 }
 
 
 void OnLoslassenDraht() {
   Serial.println("OnLoslassenDraht()");
-  vol.tone(1000, 0);
+  digitalWrite(4, LOW);
 }
 
 void OnSpielStart() {
@@ -203,8 +257,22 @@ void OnAnzeigenAktualisierenCheck() {
 void OnAnzeigenAktualisierenInterval() {
   //Serial.println("OnAnzeigenAktualisierenInterval()");
   int ZeitSekunden = (millis() - SpielStartZeitstempel) / 1000;
+
   float ZeitSekunden_Float = (float)(millis() - SpielStartZeitstempel) / 1000.0f;
-  zeit_segment.print(ZeitSekunden);
+
+  int m;
+  int s;
+  SekundenZuMinutenSekunden(ZeitSekunden, m, s);
+  String lcdText = ZeitFormattiert(m, s);
+
+  if((s % 2) == 0) {
+    // Sekunden gerade
+    zeit_segment.drawColon(true);
+  } else {
+    zeit_segment.drawColon(false);
+  }
+  
+  zeit_segment.println(lcdText);
   zeit_segment.writeDisplay();
 
   Serial.println(ZeitSekunden_Float);
@@ -215,17 +283,28 @@ void OnAnzeigenAktualisierenInterval() {
 
   fehler_segment.print(FehlerCounter);
   fehler_segment.writeDisplay();
-
-
 }
 
-String ZweistellenFormattiert(int n) {
-  if (n <= 9) {
-    return String("0") + String(n);
+String ZeitFormattiert(int m, int s) {
+  String myString;
+
+  if (m <= 9) {
+    myString.concat("0");
+    myString.concat(m);
   }
-  if (n > 9 && n <= 99) {
-    return String(n);
+  if (m > 9 && m <= 99) {
+    myString.concat(m);
   }
+
+  if (s <= 9) {
+    myString.concat("0");
+    myString.concat(s);
+  }
+  if (s > 9 && s <= 99) {
+    myString.concat(s);
+  }
+
+  return myString;
 }
 
 void SekundenZuMinutenSekunden( const uint32_t seconds, int &m, int &s )
@@ -235,30 +314,4 @@ void SekundenZuMinutenSekunden( const uint32_t seconds, int &m, int &s )
   t = (t - s) / 60;
   m = t % 60;
   t = (t - m) / 60;
-}
-
-void playWinSound() {
-  for (int i = 0; i <= 8; i++) {
-    vol.tone(261 * 2, 255);
-    vol.delay(50);
-    vol.tone(261 * 2, 255);
-    vol.delay(50);
-  }
-
-  for (int i = 0; i <= 8; i++) {
-    vol.tone(261 * 3, 255);
-    vol.delay(50);
-    vol.tone(261 * 3, 255);
-    vol.delay(50);
-  }
-
-
-  for (int i = 0; i <= 8; i++) {
-    vol.tone(440 * 4, 255);
-    vol.delay(50);
-    vol.tone(440 * 4, 255);
-    vol.delay(50);
-  }
-
-  vol.tone(1000, 0);
 }
