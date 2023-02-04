@@ -7,7 +7,6 @@
 // 19.11.2022 - Basis
 // 23.01.2023 - Tests
 // 27.01.2023 - Hinzufügen von Input Pullup
-// Gravag-Thermo Erdgas
 
 int MaxZeit = 120;
 int MaxFehler = 100;
