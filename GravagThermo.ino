@@ -100,6 +100,7 @@ void loop() {
   }
 
   OnAnzeigenAktualisierenCheck();
+  OnFehlerTimerCheck();
 
 }
 
@@ -107,6 +108,12 @@ void loop() {
 
 byte SpielStatus = 0; // ( 0 = nicht gestartet | 1 = läuft )
 int FehlerCounter = 0;
+
+bool FehlerTimerAktiv = false;
+long FehlerTimerTriggerZeitstempel = 0L;
+int FehlerTimerInterval = 250;
+int FehlerTimerStrafe = 1;
+
 long SpielStartZeitstempel = 0L;
 long SpielEndeZeitstempel = 0L;
 
@@ -198,6 +205,10 @@ void OnBehruehrungDraht() {
   if (SpielStatus == 1) {
     FehlerCounter++;
     digitalWrite(buzzer_output_pin, HIGH);
+
+    FehlerTimerAktiv = true;
+    FehlerTimerTriggerZeitstempel = millis() + FehlerTimerInterval;
+
   }
 }
 
@@ -205,6 +216,25 @@ void OnBehruehrungDraht() {
 void OnLoslassenDraht() {
   Serial.println("OnLoslassenDraht()");
   digitalWrite(buzzer_output_pin, LOW);
+  FehlerTimerAktiv = false;
+}
+
+void OnFehlerTimerCheck() {
+  if (FehlerTimerAktiv) {
+    if (SpielStatus == 1) {
+      if (FehlerTimerTriggerZeitstempel <= millis()) {
+        FehlerTimerTriggerZeitstempel = millis() + FehlerTimerInterval;
+        OnFehlerTimerTrigger();
+      }
+    } else {
+      FehlerTimerAktiv = false;
+    }
+  }
+}
+
+void OnFehlerTimerTrigger() {
+  // Spieler mit FehlerTimerStrafe strafen!
+  FehlerCounter = FehlerCounter + FehlerTimerStrafe;
 }
 
 void OnSpielStart() {
