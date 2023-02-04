@@ -109,7 +109,7 @@ long SpielStartZeitstempel = 0L;
 long SpielEndeZeitstempel = 0L;
 
 long LastAnzeigenUpdateZeitstempel = 0L;
-int AnzeigenUpdateInterval = 100;
+int AnzeigenUpdateInterval = 100; // ms
 
 // EVENTS
 
