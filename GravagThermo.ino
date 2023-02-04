@@ -21,6 +21,7 @@ Adafruit_7segment punkte_segment = Adafruit_7segment();
 byte pos1_pin = 2;  // START HALL-SENSOR-PIN
 byte pos2_pin = 3;  // ZIEL HALL-SENSOR-PIN
 byte error_input_pin = 5; // KURZSCHLUSS FEHLER COUNTER
+byte buzzer_output_pin = 4;
 
 byte pos1_last_status = 0;  // START ( 0 = abgelegt | 1 = angehoben )
 byte pos2_last_status = 0;  // ENDE ( 0 = abgelegt | 1 = angehoben )
@@ -35,6 +36,7 @@ void setup() {
   pinMode(pos1_pin, INPUT);  // START
   pinMode(pos2_pin, INPUT);  // ENDE
   pinMode(error_input_pin, INPUT_PULLUP);
+  pinMode(buzzer_output_pin, OUTPUT);
   Serial.begin(115200);
 
   // 7-Segment-Anzeigen
@@ -195,14 +197,14 @@ void OnBehruehrungDraht() {
   Serial.println("OnBehruehrungDraht()");
   if (SpielStatus == 1) {
     FehlerCounter++;
+    digitalWrite(buzzer_output_pin, HIGH);
   }
-  digitalWrite(4, HIGH);
 }
 
 
 void OnLoslassenDraht() {
   Serial.println("OnLoslassenDraht()");
-  digitalWrite(4, LOW);
+  digitalWrite(buzzer_output_pin, LOW);
 }
 
 void OnSpielStart() {
@@ -218,12 +220,17 @@ void OnSpielEnde() {
   Serial.print(Zeit);
   Serial.println(" ms");
 
+  OnAnzeigenAktualisierenInterval();
+
+  digitalWrite(buzzer_output_pin, LOW);
+  playWinSound();
+
   //int Minuten = 0;
   //int Sekunden = 0;
   //SekundenZuMinutenSekunden(ZeitSekunden, Minuten, Sekunden);
   //Serial.println(ZweistellenFormattiert(Minuten) + ZweistellenFormattiert(Sekunden));
-  zeit_segment.print(ZeitSekunden);
-  zeit_segment.writeDisplay();
+  //zeit_segment.print(ZeitSekunden);
+  //zeit_segment.writeDisplay();
 
 }
 
@@ -265,13 +272,13 @@ void OnAnzeigenAktualisierenInterval() {
   SekundenZuMinutenSekunden(ZeitSekunden, m, s);
   String lcdText = ZeitFormattiert(m, s);
 
-  if((s % 2) == 0) {
+  if ((s % 2) == 0) {
     // Sekunden gerade
     zeit_segment.drawColon(true);
   } else {
     zeit_segment.drawColon(false);
   }
-  
+
   zeit_segment.println(lcdText);
   zeit_segment.writeDisplay();
 
@@ -314,4 +321,21 @@ void SekundenZuMinutenSekunden( const uint32_t seconds, int &m, int &s )
   t = (t - s) / 60;
   m = t % 60;
   t = (t - m) / 60;
+}
+
+void playWinSound() {
+  vol.begin();
+  vol.setMasterVolume(1);
+
+  vol.tone(261, 255);
+  vol.delay(500);
+
+  vol.tone(329, 255);
+  vol.delay(500);
+
+  vol.tone(523, 255);
+  vol.delay(500);
+
+  vol.noTone();
+  vol.end();
 }
