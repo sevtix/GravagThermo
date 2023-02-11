@@ -505,7 +505,8 @@ void playStartAnimation() {
   writeDigitsRaw(fehler_segment, 63, 63, 63, 62);
   delay(startupAnimationDelay);
   writeDigitsRaw(fehler_segment, 63, 63, 63, 63);
-  delay(startupAnimationDelay);
+  
+  delay(2000);
 
   // -----------------------------------
 
