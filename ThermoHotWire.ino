@@ -31,6 +31,8 @@ int error_input_validation_signal = 0; // Logik-Signal des aktuellen EIV-Check
 long error_input_validation_end_time = 0L; // End-Zeit des aktullen EIV-Check
 int error_input_validation_delay = 10; // Dauer für für EIV (Validierung)
 
+byte startupAnimationDelay = 45;
+
 void setup() {
   pinMode(pos1_pin, INPUT);  // START
   pinMode(pos2_pin, INPUT);  // ENDE
@@ -345,13 +347,190 @@ void SekundenZuMinutenSekunden( const uint32_t seconds, int &m, int &s )
 }
 
 void playStartAnimation() {
-  
+  writeDigitsRaw(punkte_segment, 32, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 48, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 56, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 60, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 62, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 0, 0, 0);
+  delay(startupAnimationDelay);
+
+  writeDigitsRaw(punkte_segment, 63, 32, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 48, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 56, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 60, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 62, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 63, 0, 0);
+  delay(startupAnimationDelay);
+
+  writeDigitsRaw(punkte_segment, 63, 63, 32, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 63, 48, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 63, 56, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 63, 60, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 63, 62, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 63, 63, 0);
+  delay(startupAnimationDelay);
+
+  writeDigitsRaw(punkte_segment, 63, 63, 63, 32);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 63, 63, 48);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 63, 63, 56);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 63, 63, 60);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 63, 63, 62);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(punkte_segment, 63, 63, 63, 63);
+  delay(startupAnimationDelay);
+
+  // -----------------------------------
+
+  writeDigitsRaw(zeit_segment, 32, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 48, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 56, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 60, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 62, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 0, 0, 0);
+  delay(startupAnimationDelay);
+
+  writeDigitsRaw(zeit_segment, 63, 32, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 48, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 56, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 60, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 62, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 63, 0, 0);
+  delay(startupAnimationDelay);
+
+  writeDigitsRaw(zeit_segment, 63, 63, 32, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 63, 48, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 63, 56, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 63, 60, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 63, 62, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 63, 63, 0);
+  delay(startupAnimationDelay);
+
+  writeDigitsRaw(zeit_segment, 63, 63, 63, 32);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 63, 63, 48);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 63, 63, 56);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 63, 63, 60);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 63, 63, 62);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(zeit_segment, 63, 63, 63, 63);
+  delay(startupAnimationDelay);
+
+  // -----------------------------------
+
+  writeDigitsRaw(fehler_segment, 32, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 48, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 56, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 60, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 62, 0, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 0, 0, 0);
+  delay(startupAnimationDelay);
+
+  writeDigitsRaw(fehler_segment, 63, 32, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 48, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 56, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 60, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 62, 0, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 63, 0, 0);
+  delay(startupAnimationDelay);
+
+  writeDigitsRaw(fehler_segment, 63, 63, 32, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 63, 48, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 63, 56, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 63, 60, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 63, 62, 0);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 63, 63, 0);
+  delay(startupAnimationDelay);
+
+  writeDigitsRaw(fehler_segment, 63, 63, 63, 32);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 63, 63, 48);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 63, 63, 56);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 63, 63, 60);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 63, 63, 62);
+  delay(startupAnimationDelay);
+  writeDigitsRaw(fehler_segment, 63, 63, 63, 63);
+  delay(startupAnimationDelay);
+
+  // -----------------------------------
+
+  writeDigitsRaw(punkte_segment, 0, 0, 0, 0);
+  writeDigitsRaw(zeit_segment, 0, 0, 0, 0);
+  writeDigitsRaw(fehler_segment, 0, 0, 0, 0);
+}
+
+void writeDigitsRaw(Adafruit_7segment display, int digit0, int digit1, int digit3, int digit4) {
+  display.writeDigitRaw(0, digit0);
+  display.writeDigitRaw(1, digit1);
+  display.writeDigitRaw(3, digit3);
+  display.writeDigitRaw(4, digit4);
+  display.writeDisplay();
 }
 
 void playWinSound() {
   // TODO
-  tone(buzzer_output_pin, 261, 1500);
+  pinMode(buzzer_output_pin, OUTPUT);
+  // put your setup code here, to run once:
+  tone(buzzer_output_pin, 261);
+  delay(750);
   tone(buzzer_output_pin, 329, 1500);
+  delay(750);
   tone(buzzer_output_pin, 523, 1500);
+  delay(1000);
   noTone(buzzer_output_pin);
 }
