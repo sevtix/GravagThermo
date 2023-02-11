@@ -56,7 +56,7 @@ void setup() {
   Serial.print("pos2_last_status=");
   Serial.println(pos2_current_status);
 
-  //vol.begin();
+  playStartAnimation();
 
 }
 
@@ -110,7 +110,7 @@ int FehlerCounter = 0;
 
 bool FehlerTimerAktiv = false;
 long FehlerTimerTriggerZeitstempel = 0L;
-int FehlerTimerInterval = 250;
+int FehlerTimerInterval = 100;
 int FehlerTimerStrafe = 1;
 
 long SpielStartZeitstempel = 0L;
@@ -250,16 +250,8 @@ void OnSpielEnde() {
   Serial.println(" ms");
 
   OnAnzeigenAktualisierenInterval();
-
   digitalWrite(buzzer_output_pin, LOW);
   playWinSound();
-
-  //int Minuten = 0;
-  //int Sekunden = 0;
-  //SekundenZuMinutenSekunden(ZeitSekunden, Minuten, Sekunden);
-  //Serial.println(ZweistellenFormattiert(Minuten) + ZweistellenFormattiert(Sekunden));
-  //zeit_segment.print(ZeitSekunden);
-  //zeit_segment.writeDisplay();
 
 }
 
@@ -352,19 +344,14 @@ void SekundenZuMinutenSekunden( const uint32_t seconds, int &m, int &s )
   t = (t - m) / 60;
 }
 
+void playStartAnimation() {
+  
+}
+
 void playWinSound() {
-  vol.begin();
-  vol.setMasterVolume(1);
-
-  vol.tone(261, 255);
-  vol.delay(500);
-
-  vol.tone(329, 255);
-  vol.delay(500);
-
-  vol.tone(523, 255);
-  vol.delay(500);
-
-  vol.noTone();
-  vol.end();
+  // TODO
+  tone(buzzer_output_pin, 261, 1500);
+  tone(buzzer_output_pin, 329, 1500);
+  tone(buzzer_output_pin, 523, 1500);
+  noTone(buzzer_output_pin);
 }
