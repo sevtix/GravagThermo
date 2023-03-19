@@ -35,9 +35,9 @@ unsigned long error_input_validation_end_time = 0L; // End-Zeit des aktullen EIV
 int error_input_validation_delay = 10; // Dauer für für EIV (Validierung)
 
 unsigned long timer_end = 0L; // Timer-Ende (Zeitstempel)
-int timer_duration = 10000; // 10 sec
+int timer_duration = 5000; // 10 sec
 bool timer_active = false;
-int timer_counter = 0; // Counter 
+int timer_counter = 0; // Counter
 int timer_counter_trigger = 5; // Counter for trigger
 
 byte startupAnimationDelay = 45;
@@ -64,7 +64,7 @@ void setup() {
   pinMode(error_input_pin, INPUT_PULLUP);
   pinMode(buzzer_output_pin, OUTPUT);
   Serial.begin(115200);
-  
+
   // 7-Segment-Anzeigen
   punkte_segment.begin(0x70);
   fehler_segment.begin(0x71);
@@ -83,7 +83,7 @@ void setup() {
   playStartAnimation();
   HighscoreLaden();
   highscore_segment.println(Highscore);
-  highscore_segment.writeDisplay(); 
+  highscore_segment.writeDisplay();
 
 }
 
@@ -126,11 +126,12 @@ void loop() {
   }
 
   // Wenn Timer End-Zeit kleiner als aktuelle Zeit ist
-  if(timer_active && timer_end <= millis()) {
-      // Timer Reset
-      timer_active = false;
-      timer_counter = 0;
-      timer_end = 0L;
+  if (timer_active && timer_end <= millis()) {
+    // Timer Reset
+    timer_active = false;
+    timer_counter = 0;
+    timer_end = 0L;
+    Serial.println("Timer Reset");
   }
 
   BeiAnzeigenAktualisierenCheck();
@@ -142,13 +143,21 @@ void loop() {
 
 void BeiAngehobenStart() {
   Serial.println("BeiAngehobenStart()");
-  if(timer_active) {
+  SpielStatus = 1;
+  SpielStartZeitstempel = millis();
+  BeiSpielStart();
+}
+
+void BeiAbgelegtStart() {
+  Serial.println("BeiAbgelegtStart()");
+  if (timer_active) {
     // Timer bereits aktiv
     // Counter dazuzählen
     timer_counter++;
+    Serial.println("timer_counter++");
 
     // Wenn Counter Trigger-Anzahl erreicht hat
-    if(timer_counter == timer_counter_trigger) {
+    if (timer_counter == timer_counter_trigger) {
       // Event auslösen
       BeiCounterTrigger();
 
@@ -162,17 +171,11 @@ void BeiAngehobenStart() {
     // Timer noch nicht aktiv
     // Timer starten und Counter dazuzählen
     timer_active = true;
+    Serial.println("Timer gestartet");
     timer_end = millis() + timer_duration;
     timer_counter++;
+    Serial.println("timer_counter++");
   }
-  
-  SpielStatus = 1;
-  SpielStartZeitstempel = millis();
-  BeiSpielStart();
-}
-
-void BeiAbgelegtStart() {
-  Serial.println("BeiAbgelegtStart()");
   if (SpielStatus == 1) {
     SpielStatus = 0;
     SpielEndeZeitstempel = millis();
@@ -224,7 +227,7 @@ void BeiSpielEnde() {
   int Punkte = CalculatePunkte(FehlerCounter, ZeitSekunden_Float);
 
   // Highscores
-  if(Punkte > Highscore) {
+  if (Punkte > Highscore) {
     Highscore = Punkte;
     HighscoreSpeichern();
     BeiAnzeigenAktualisierenInterval();
@@ -233,7 +236,7 @@ void BeiSpielEnde() {
     BeiAnzeigenAktualisierenInterval();
     playWinSound();
   }
-  
+
   digitalWrite(buzzer_output_pin, LOW);
 }
 
@@ -255,8 +258,13 @@ void BeiFehlerTimerCheck() {
 }
 
 void BeiCounterTrigger() {
-  Highscore = 0;
-  HighscoreSpeichern();
+  Serial.println("BeiCounterTrigger()");
+
+  if (Highscore != 0) {
+    Highscore = 0;
+    HighscoreSpeichern();
+  }
+
   digitalWrite(buzzer_output_pin, HIGH);
   delay(50);
   digitalWrite(buzzer_output_pin, LOW);
@@ -269,7 +277,7 @@ void BeiCounterTrigger() {
   delay(50);
   digitalWrite(buzzer_output_pin, LOW);
   highscore_segment.println(Highscore);
-  highscore_segment.writeDisplay(); 
+  highscore_segment.writeDisplay();
 }
 
 void BeiFehlerTimerTrigger() {
@@ -379,7 +387,7 @@ void BeiAnzeigenAktualisierenInterval() {
   fehler_segment.writeDisplay();
 
   highscore_segment.println(Highscore);
-  highscore_segment.writeDisplay(); 
+  highscore_segment.writeDisplay();
 }
 
 void writeDigitsRaw(Adafruit_7segment display, int digit0, int digit1, int digit3, int digit4) {
@@ -616,7 +624,7 @@ void playStartAnimation() {
   writeDigitsRaw(fehler_segment, 63, 63, 63, 62);
   delay(startupAnimationDelay);
   writeDigitsRaw(fehler_segment, 63, 63, 63, 63);
-  
+
   delay(2000);
 
   // -----------------------------------
@@ -643,12 +651,29 @@ void playWinSound() {
 void playHighscoreSound() {
   // TODO
   pinMode(buzzer_output_pin, OUTPUT);
-  tone(buzzer_output_pin, 261*2);
+  tone(buzzer_output_pin, 261 * 2);
   delay(750);
-  tone(buzzer_output_pin, 329*2);
+  tone(buzzer_output_pin, 329 * 2);
   delay(750);
-  tone(buzzer_output_pin, 523*2);
-  delay(1000);
+  
+  tone(buzzer_output_pin, 523 * 2);
+  delay(250);
+  noTone(buzzer_output_pin);
+  delay(50);
+
+  tone(buzzer_output_pin, 523 * 2);
+  delay(250);
+  noTone(buzzer_output_pin);
+  delay(50);
+
+  tone(buzzer_output_pin, 523 * 2);
+  delay(250);
+  noTone(buzzer_output_pin);
+  delay(50);
+
+  tone(buzzer_output_pin, 523 * 2);
+  delay(750);
+    
   noTone(buzzer_output_pin);
 }
 
